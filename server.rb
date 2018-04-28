@@ -7,12 +7,22 @@
 # encoding: UTF-8
 
 require 'sinatra'
+require './block'
 
 get'/' do #이게 주소임. 여기 들어가면 텍스트를 찍자 라는 것
-	"block!"
+	"This is Block List."
 end
 
 get'/mine' do
-	"mining!"
+	aBlock.mining.to_s
 end
+
+
+
+aBlock = Blockchain.new
+
+
+
+
+#http://localhost:4567/
 
