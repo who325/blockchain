@@ -2,6 +2,7 @@
 #blockchain code를 넣기 시작하는 코드 
 
 require 'securerandom'
+require 'httparty'
 
 class Blockchain
 
@@ -9,6 +10,7 @@ class Blockchain
 		@chain = []
 		@trans = []
 		@wallet = {} 
+		@node = []
 	end
 
 	def show_all_wallet
@@ -95,6 +97,34 @@ class Blockchain
 
 	def all_blocks
 		@chain #전체 리스트만 찍어주는 함수
+	end
+
+	def recv(blocks)
+		blocks.each do |b|
+			@chain << b 
+		end
+		@chain
+	end	
+
+#인터넷에 던지는 방식은 겟방식과 포스트 방식이 있는데 post방식이 훨씬 보낼수있는 데이터양이 큼
+#(암호화가 필요하면 https로 보내야함)
+	def ask_other_block
+		@node.each do |n|
+			other_block = HTTParty.get("http://localhost:" + n + "/number_of_blocks").body
+			#파일은 제이슨으로 패킹해서 저장함. 원래는 file -> XML -> JSON(요즘)
+			if @chain.size < other_block.to_i
+				jsoned_chain = @chain.to_json #이렇게 패킹된 정보를 작은녀석이 큰녀석한테 던져야 함
+				#이제 데이터를 던질것임
+				full_chain = HTTParty.get("http://localhost:" + n + "/recv?blocks=" + jsoned_chain).body
+				@chain = JSON.parse(full_chain)
+			end
+		end
+	end
+
+	def add_node(node)
+		@node << node
+		@node.uniq!
+		@node  
 	end
 
 end

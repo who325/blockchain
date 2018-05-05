@@ -12,6 +12,29 @@ require './block_class'
 
 aBlock = Blockchain.new
 
+get'/number_of_blocks' do 
+	aBlock.all_blocks.size.to_s
+end
+
+#작은녀석이 던진 블록을 받는 녀석. 리시버
+get'/recv' do
+	recv_block = JSON.parse(params["blocks"]) #포장된 제이슨파일을 파스해서 루비가 알아볼수있는 형태로 저장
+	aBlock.recv(recv_block)
+	aBlock.all_blocks.to_json #json 형태로 리턴 - 호출한녀석한테 리턴이 그대로 대치가 됨 
+end
+
+get'/ask' do
+	aBlock.ask_other_block.to_s
+
+end
+
+#내 컴퓨터가 누구랑 이웃인지 저장을 하는 것
+get'/add_node' do
+	aBlock.add_node(params[:node]).to_s
+	#aBlock.add_node(params["node"]) -> 이것도 같은거임
+end
+
+
 get'/' do #이게 주소임. 여기 들어가면 텍스트를 찍자 라는 것
 
 	message = "<center>"
